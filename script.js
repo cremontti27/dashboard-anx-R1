@@ -160,7 +160,21 @@ function extractData(workbook) {
             tipo: 'Alimentação',
             data: parseExcelDate(d.Entrada)
         }))
-    ].filter(e => e.data && e.data <= dataReferencia);
+    ].filter(e => {
+        if (!e.data) return false;
+        if (e.data > dataReferencia) return false;
+
+        // Aplicar filtro de periodo (Data Inicial / Data Final)
+        const { inicio, fim } = getFiltrosPeriodo();
+
+        // Se inicio > fim, filtro invalido - ignorar periodo
+        if (inicio && fim && inicio > fim) return true;
+
+        if (inicio && e.data < inicio) return false;
+        if (fim    && e.data > fim)    return false;
+
+        return true;
+    });
 
     console.log('Total de entradas processadas:', todasEntradas.length);
 
@@ -417,6 +431,82 @@ function destacarDataManual() {
     } else {
         input.style.border = '2px solid #cbd5e0';
         input.style.background = 'white';
+    }
+}
+
+// =============================================
+// FILTRO DE PERÍODO
+// =============================================
+
+function getFiltrosPeriodo() {
+    const inicioVal = document.getElementById('filtroDataInicio')?.value;
+    const fimVal    = document.getElementById('filtroDataFim')?.value;
+
+    const inicio = inicioVal ? new Date(inicioVal + 'T00:00:00') : null;
+    const fim    = fimVal    ? new Date(fimVal    + 'T23:59:59') : null;
+
+    return { inicio, fim };
+}
+
+function onFiltroDataChange() {
+    const { inicio, fim } = getFiltrosPeriodo();
+    const infoEl = document.getElementById('filtroPeriodoInfo');
+
+    // Highlight dos campos
+    const elInicio = document.getElementById('filtroDataInicio');
+    const elFim    = document.getElementById('filtroDataFim');
+
+    [elInicio, elFim].forEach(el => {
+        if (el.value) {
+            el.style.border = '2px solid #f6ad55';
+            el.style.background = 'rgba(246, 173, 85, 0.08)';
+        } else {
+            el.style.border = '2px solid #cbd5e0';
+            el.style.background = 'white';
+        }
+    });
+
+    // Validação: início > fim
+    if (inicio && fim && inicio > fim) {
+        infoEl.innerHTML = '⚠️ <strong style="color:#e53e3e">Data inicial não pode ser maior que a data final.</strong>';
+        return;
+    }
+
+    // Mensagem informativa
+    if (!inicio && !fim) {
+        infoEl.textContent = '';
+    } else if (inicio && !fim) {
+        infoEl.innerHTML = `📆 Exibindo registros a partir de <strong>${inicio.toLocaleDateString('pt-BR')}</strong>`;
+    } else if (!inicio && fim) {
+        infoEl.innerHTML = `📆 Exibindo registros até <strong>${fim.toLocaleDateString('pt-BR')}</strong>`;
+    } else {
+        infoEl.innerHTML = `📆 Período selecionado: <strong>${inicio.toLocaleDateString('pt-BR')}</strong> até <strong>${fim.toLocaleDateString('pt-BR')}</strong>`;
+    }
+
+    // Reprocessar automaticamente se houver dados carregados
+    if (workbookGlobal) {
+        const processedData = extractData(workbookGlobal);
+        renderDashboard(processedData);
+    }
+}
+
+function limparFiltrosPeriodo() {
+    const elInicio = document.getElementById('filtroDataInicio');
+    const elFim    = document.getElementById('filtroDataFim');
+
+    elInicio.value = '';
+    elFim.value    = '';
+
+    [elInicio, elFim].forEach(el => {
+        el.style.border = '2px solid #cbd5e0';
+        el.style.background = 'white';
+    });
+
+    document.getElementById('filtroPeriodoInfo').textContent = '';
+
+    if (workbookGlobal) {
+        const processedData = extractData(workbookGlobal);
+        renderDashboard(processedData);
     }
 }
 
