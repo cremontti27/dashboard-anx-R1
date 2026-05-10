@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pernoite Boa Vista - AVSI Brasil</title>
+
+    <!-- Bibliotecas externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>📊 Dashboard Pernoite Boa Vista</h1>
+                    <p>AVSI Brasil - Sistema de Análise e Monitoramento</p>
+                </div>
+                <div class="header-badge" id="statusBadge">
+                    Aguardando dados
+                </div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Arraste o arquivo Excel ou clique aqui</div>
+            <div class="upload-subtext">Formato aceito: .xlsx (Pernoite_Boa_Vista_*.xlsx)</div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls">
+        </div>
+
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <div class="loading-text">Processando seus dados...</div>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <!-- CONTROLES DE FILTROS -->
+            <div class="insights-section" style="background: linear-gradient(135deg, rgba(0, 104, 71, 0.15) 0%, rgba(154, 205, 50, 0.15) 100%); border: 2px solid #006847; padding: 25px;">
+                <h2 style="margin-bottom: 20px; font-size: 20px;">⚙️ Parâmetros e Filtros</h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 20px; align-items: flex-end;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; font-weight: 600; color: #718096;">📅 Data de Referência (opcional)</label>
+                        <input id="dataManual" type="date"
+                               placeholder="dd/mm/aaaa"
+                               style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e0; font-size: 14px; font-weight: 500; transition: all 0.3s ease;"
+                               oninput="destacarDataManual()" />
+                        <small style="color: #a0aec0; font-size: 11px;">⚡ Vazio = usa última data do Excel (recomendado)</small>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; font-weight: 600; color: transparent;">.</label>
+                        <button onclick="reprocessarDados()"
+                                style="width: 100%; padding: 12px; background: linear-gradient(135deg, #006847 0%, #00a854 100%); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 104, 71, 0.4);"
+                                onmouseover="this.style.boxShadow='0 8px 25px rgba(0, 104, 71, 0.6)'"
+                                onmouseout="this.style.boxShadow='0 4px 15px rgba(0, 104, 71, 0.4)'">
+                            🔄 Atualizar Dashboard
+                        </button>
+                        <small style="color: transparent; font-size: 11px;">.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="charts-grid" id="chartsGrid"></div>
+            <div class="insights-section" id="insightsSection"></div>
+            <div class="last-updated" id="lastUpdated"></div>
+
+            <!-- Ranking Top 50 -->
+            <div class="ranking-section">
+                <button class="ranking-toggle-btn" onclick="toggleRanking()">
+                    📈 Ver Ranking 50+ Ativos
+                </button>
+                <div class="ranking-container" id="rankingContainer">
+                    <h2 style="color: #006847; margin-bottom: 10px;">🏆 Top 50 Pessoas Mais Ativas</h2>
+                    <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">Ranking baseado no número de dias com presença registrada</p>
+                    <div style="overflow-x: auto;">
+                        <table class="ranking-table" id="rankingTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nome</th>
+                                    <th>Grupo</th>
+                                    <th>Idade</th>
+                                    <th>Nacionalidade</th>
+                                    <th>Dias Ativo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingBody">
+                                <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crédito do Desenvolvedor -->
+            <div class="developer-credit">
+                💻 Desenvolvido por <a href="https://www.linkedin.com/in/wellington-rodrigues-sr46/" target="_blank" rel="noopener noreferrer">Wellington Rodrigues</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="script.js"></script>
+</body>
+</html>
