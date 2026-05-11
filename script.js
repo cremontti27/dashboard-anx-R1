@@ -119,12 +119,13 @@ function extractData(workbook) {
         ...diasF4Sheet.map(d => parseExcelDate(d.Entrada))
     ].filter(d => d !== null);
 
-    const dataManualInput = document.getElementById('dataManual')?.value;
+    // dataReferencia: usa Data Final do filtro de período (se definida), ou última data do Excel
     let dataReferencia;
+    const { inicio: filtroInicio, fim: filtroFim } = getFiltrosPeriodo();
 
-    if (dataManualInput && dataManualInput.trim() !== '') {
-        dataReferencia = new Date(dataManualInput + 'T00:00:00');
-        console.log('⚠️ Usando DATA MANUAL:', dataManualInput);
+    if (filtroFim) {
+        dataReferencia = new Date(filtroFim);
+        console.log('📆 Usando Data Final do filtro de período:', filtroFim);
     } else {
         dataReferencia = todasDatas.length > 0
             ? new Date(Math.max(...todasDatas.map(d => d.getTime())))
@@ -164,14 +165,12 @@ function extractData(workbook) {
         if (!e.data) return false;
         if (e.data > dataReferencia) return false;
 
-        // Aplicar filtro de periodo (Data Inicial / Data Final)
-        const { inicio, fim } = getFiltrosPeriodo();
+        // Filtro de período — usa variáveis já resolvidas acima
+        // Se inicio > fim, filtro inválido — ignorar período
+        if (filtroInicio && filtroFim && filtroInicio > filtroFim) return true;
 
-        // Se inicio > fim, filtro invalido - ignorar periodo
-        if (inicio && fim && inicio > fim) return true;
-
-        if (inicio && e.data < inicio) return false;
-        if (fim    && e.data > fim)    return false;
+        if (filtroInicio && e.data < filtroInicio) return false;
+        if (filtroFim    && e.data > filtroFim)    return false;
 
         return true;
     });
@@ -472,15 +471,21 @@ function onFiltroDataChange() {
         return;
     }
 
-    // Mensagem informativa
+    // Mensagem informativa com novo design
     if (!inicio && !fim) {
-        infoEl.textContent = '';
+        infoEl.innerHTML = '';
     } else if (inicio && !fim) {
-        infoEl.innerHTML = `📆 Exibindo registros a partir de <strong>${inicio.toLocaleDateString('pt-BR')}</strong>`;
+        infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
+            📆 Exibindo a partir de <strong>${inicio.toLocaleDateString('pt-BR')}</strong>
+        </span>`;
     } else if (!inicio && fim) {
-        infoEl.innerHTML = `📆 Exibindo registros até <strong>${fim.toLocaleDateString('pt-BR')}</strong>`;
+        infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
+            📆 Exibindo até <strong>${fim.toLocaleDateString('pt-BR')}</strong>
+        </span>`;
     } else {
-        infoEl.innerHTML = `📆 Período selecionado: <strong>${inicio.toLocaleDateString('pt-BR')}</strong> até <strong>${fim.toLocaleDateString('pt-BR')}</strong>`;
+        infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
+            📆 Período ativo: <strong>${inicio.toLocaleDateString('pt-BR')}</strong> → <strong>${fim.toLocaleDateString('pt-BR')}</strong>
+        </span>`;
     }
 
     // Reprocessar automaticamente se houver dados carregados

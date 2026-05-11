@@ -48,41 +48,84 @@
 
         <div id="dashboard" class="hidden">
             <!-- CONTROLES DE FILTROS -->
-            <div class="insights-section" style="background: linear-gradient(135deg, rgba(0, 104, 71, 0.15) 0%, rgba(154, 205, 50, 0.15) 100%); border: 2px solid #006847; padding: 25px;">
-                <h2 style="margin-bottom: 20px; font-size: 20px;">⚙️ Parâmetros e Filtros</h2>
+            <div style="
+                background: rgba(255,255,255,0.98);
+                border-radius: 20px;
+                padding: 28px 32px;
+                margin-bottom: 30px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+                border: 1px solid rgba(0,104,71,0.15);
+                position: relative;
+                overflow: hidden;
+            ">
+                <!-- Faixa decorativa superior -->
+                <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#006847,#00a854,#9ACD32);border-radius:20px 20px 0 0;"></div>
 
-                <!-- FILTRO DE PERÍODO -->
-                <div>
-                    <label style="font-size: 13px; font-weight: 600; color: #718096; display: block; margin-bottom: 12px;">📆 Filtro de Período de Entradas (opcional)</label>
-                    <div style="display: grid; grid-template-columns: 1fr auto 1fr auto auto; gap: 12px; align-items: flex-end;">
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <label style="font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px;">Data Inicial</label>
-                            <input id="filtroDataInicio" type="date"
-                                   style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e0; font-size: 14px; font-weight: 500; transition: all 0.3s ease;"
-                                   oninput="onFiltroDataChange()" />
-                        </div>
-                        <span style="font-size: 15px; font-weight: 700; color: #718096; padding-bottom: 12px;">até</span>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <label style="font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px;">Data Final</label>
-                            <input id="filtroDataFim" type="date"
-                                   style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e0; font-size: 14px; font-weight: 500; transition: all 0.3s ease;"
-                                   oninput="onFiltroDataChange()" />
-                        </div>
-                        <button onclick="reprocessarDados()"
-                                style="padding: 12px 20px; background: linear-gradient(135deg, #006847 0%, #00a854 100%); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 104, 71, 0.4);"
-                                onmouseover="this.style.boxShadow='0 8px 25px rgba(0, 104, 71, 0.6)'"
-                                onmouseout="this.style.boxShadow='0 4px 15px rgba(0, 104, 71, 0.4)'">
-                            🔄 Atualizar Dashboard
-                        </button>
-                        <button onclick="limparFiltrosPeriodo()"
-                                style="padding: 12px 18px; background: #e2e8f0; color: #4a5568; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; transition: all 0.3s ease;"
-                                onmouseover="this.style.background='#cbd5e0'"
-                                onmouseout="this.style.background='#e2e8f0'">
-                            🗑️ Limpar Filtros
-                        </button>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px;">
+                    <div style="width:36px;height:36px;background:linear-gradient(135deg,#006847,#00a854);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚙️</div>
+                    <div>
+                        <h2 style="font-size:18px;font-weight:800;color:#1a202c;margin:0;letter-spacing:-0.3px;">Parâmetros e Filtros</h2>
+                        <p style="font-size:12px;color:#a0aec0;margin:0;font-weight:500;">Selecione o período para filtrar os dados do dashboard</p>
                     </div>
-                    <div id="filtroPeriodoInfo" style="margin-top: 10px; font-size: 12px; color: #718096; min-height: 18px;"></div>
                 </div>
+
+                <!-- Linha de filtros -->
+                <div style="display:grid;grid-template-columns:1fr 28px 1fr auto auto;gap:12px;align-items:flex-end;">
+
+                    <!-- Data Inicial -->
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:11px;font-weight:700;color:#006847;text-transform:uppercase;letter-spacing:0.8px;display:flex;align-items:center;gap:5px;">
+                            <span style="display:inline-block;width:6px;height:6px;background:#006847;border-radius:50%;"></span>
+                            Data Inicial
+                        </label>
+                        <div style="position:relative;">
+                            <input id="filtroDataInicio" type="date"
+                                style="width:100%;padding:11px 14px;border-radius:10px;border:2px solid #e2e8f0;font-size:14px;font-weight:500;transition:all 0.25s ease;background:#f8fafc;color:#1a202c;outline:none;cursor:pointer;"
+                                onfocus="this.style.borderColor='#006847';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(0,104,71,0.12)'"
+                                onblur="this.style.boxShadow='none'"
+                                oninput="onFiltroDataChange()" />
+                        </div>
+                    </div>
+
+                    <!-- Separador "até" -->
+                    <div style="display:flex;align-items:center;justify-content:center;padding-bottom:2px;">
+                        <span style="font-size:13px;font-weight:700;color:#a0aec0;">→</span>
+                    </div>
+
+                    <!-- Data Final -->
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:11px;font-weight:700;color:#006847;text-transform:uppercase;letter-spacing:0.8px;display:flex;align-items:center;gap:5px;">
+                            <span style="display:inline-block;width:6px;height:6px;background:#006847;border-radius:50%;"></span>
+                            Data Final
+                        </label>
+                        <div style="position:relative;">
+                            <input id="filtroDataFim" type="date"
+                                style="width:100%;padding:11px 14px;border-radius:10px;border:2px solid #e2e8f0;font-size:14px;font-weight:500;transition:all 0.25s ease;background:#f8fafc;color:#1a202c;outline:none;cursor:pointer;"
+                                onfocus="this.style.borderColor='#006847';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(0,104,71,0.12)'"
+                                onblur="this.style.boxShadow='none'"
+                                oninput="onFiltroDataChange()" />
+                        </div>
+                    </div>
+
+                    <!-- Botão Atualizar -->
+                    <button onclick="reprocessarDados()"
+                        style="padding:12px 22px;background:linear-gradient(135deg,#006847 0%,#00a854 100%);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;transition:all 0.25s ease;box-shadow:0 4px 15px rgba(0,104,71,0.35);white-space:nowrap;display:flex;align-items:center;gap:7px;"
+                        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(0,104,71,0.5)'"
+                        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0,104,71,0.35)'">
+                        🔄 Atualizar
+                    </button>
+
+                    <!-- Botão Limpar -->
+                    <button onclick="limparFiltrosPeriodo()"
+                        style="padding:12px 18px;background:#f1f5f9;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;transition:all 0.25s ease;white-space:nowrap;display:flex;align-items:center;gap:6px;"
+                        onmouseover="this.style.background='#e2e8f0';this.style.borderColor='#cbd5e0';this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.background='#f1f5f9';this.style.borderColor='#e2e8f0';this.style.transform='translateY(0)'">
+                        🗑️ Limpar
+                    </button>
+                </div>
+
+                <!-- Mensagem de status do filtro -->
+                <div id="filtroPeriodoInfo" style="margin-top:14px;min-height:24px;"></div>
             </div>
 
             <div class="stats-grid" id="statsGrid"></div>
