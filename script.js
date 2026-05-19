@@ -384,6 +384,38 @@ function extractData(workbook) {
         return idade >= 0 && idade <= 17;
     }).length;
 
+    // ── Idosos (60+) ──
+    const idososAtivos = individuosAtivos.filter(ind => (ind.idade_anos || 0) >= 60);
+    const totalIdosos = idososAtivos.length;
+    const idososMasc = idososAtivos.filter(ind => ind.Sexo === 'Masculino').length;
+    const idososFem  = idososAtivos.filter(ind => ind.Sexo === 'Feminino').length;
+    const idososNacionalidade = {};
+    idososAtivos.forEach(ind => {
+        const nac = ind.Nacionalidade || 'Não informado';
+        idososNacionalidade[nac] = (idososNacionalidade[nac] || 0) + 1;
+    });
+    const idososFaixas = { '60-64': 0, '65-69': 0, '70-74': 0, '75-79': 0, '80+': 0 };
+    idososAtivos.forEach(ind => {
+        const a = ind.idade_anos || 0;
+        if (a <= 64) idososFaixas['60-64']++;
+        else if (a <= 69) idososFaixas['65-69']++;
+        else if (a <= 74) idososFaixas['70-74']++;
+        else if (a <= 79) idososFaixas['75-79']++;
+        else idososFaixas['80+']++;
+    });
+
+    // ── PCD (coluna Comentários da aba principal) ──
+    const idsPCDAtivos = new Set(
+        registrosAtivos
+            .filter(r => r['Comentários'] && String(r['Comentários']).toUpperCase().includes('PCD'))
+            .map(r => r._index)
+    );
+    const individuosPCDAtivos = individuosAtivos.filter(ind => idsPCDAtivos.has(ind._parent_index));
+    const totalPCDAtivos = individuosPCDAtivos.length;
+    const pcdIdosos = individuosPCDAtivos.filter(ind => (ind.idade_anos || 0) >= 60).length;
+    const pcdMasc = individuosPCDAtivos.filter(ind => ind.Sexo === 'Masculino').length;
+    const pcdFem  = individuosPCDAtivos.filter(ind => ind.Sexo === 'Feminino').length;
+
     return {
         dataReferencia,
         totalHistorico: individuosSheet.length,
@@ -404,7 +436,9 @@ function extractData(workbook) {
         venezuelanosAtivos,
         tempoPermanencia,
         evolucaoMensal,
-        criancasAtivas
+        criancasAtivas,
+        totalIdosos, idososMasc, idososFem, idososNacionalidade, idososFaixas,
+        totalPCDAtivos, pcdIdosos, pcdMasc, pcdFem
     };
 }
 
@@ -622,6 +656,20 @@ function renderStats(data) {
             label: 'Alimentação',
             value: (data.utilizacaoEspaco['Alimentação'] || 0).toLocaleString('pt-BR'),
             detail: `${((data.utilizacaoEspaco['Alimentação'] || 0) / data.baseAtiva * 100).toFixed(1)}% da base ativa`,
+        },
+        {
+            icon: '🧓',
+            label: 'Idosos Ativos (60+)',
+            value: data.totalIdosos.toLocaleString('pt-BR'),
+            detail: `♂ ${data.idososMasc} masc · ♀ ${data.idososFem} fem`,
+            trend: { text: `${(data.totalIdosos / data.baseAtiva * 100).toFixed(1)}% da base`, class: 'warning' }
+        },
+        {
+            icon: '♿',
+            label: 'PCD Ativos',
+            value: data.totalPCDAtivos.toLocaleString('pt-BR'),
+            detail: `♂ ${data.pcdMasc} masc · ♀ ${data.pcdFem} fem · ${data.pcdIdosos} idosos`,
+            trend: { text: `${(data.totalPCDAtivos / data.baseAtiva * 100).toFixed(1)}% da base`, class: 'warning' }
         }
     ];
 
@@ -711,6 +759,14 @@ function renderCharts(data) {
         <div class="chart-card" style="grid-column: 1 / -1;">
             <h3>📊 Tendência de Ocupação (30 dias)</h3>
             <div class="chart-container"><canvas id="tendenciaChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>🧓 Faixas Etárias — Idosos (60+)</h3>
+            <div class="chart-container"><canvas id="idososFaixasChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>🌍 Nacionalidade dos Idosos (60+)</h3>
+            <div class="chart-container"><canvas id="idososNacChart"></canvas></div>
         </div>
     `;
 
@@ -965,7 +1021,64 @@ function renderCharts(data) {
             }
         }
     });
-}
+
+    // ── Gráfico: Faixas etárias dos idosos ──
+    charts.idososFaixas = new Chart(document.getElementById('idososFaixasChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(data.idososFaixas),
+            datasets: [{
+                label: 'Idosos',
+                data: Object.values(data.idososFaixas),
+                backgroundColor: ['#f59e0b', '#d97706', '#b45309', '#92400e', '#78350f'],
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: { anchor: 'end', align: 'top', ...datalabelsConfig }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // ── Gráfico: Nacionalidade dos idosos ──
+    const topNacIdosos = Object.entries(data.idososNacionalidade).sort((a, b) => b[1] - a[1]);
+    charts.idososNac = new Chart(document.getElementById('idososNacChart'), {
+        type: 'bar',
+        data: {
+            labels: topNacIdosos.map(p => p[0]),
+            datasets: [{
+                label: 'Idosos',
+                data: topNacIdosos.map(p => p[1]),
+                backgroundColor: topNacIdosos.map(([pais]) =>
+                    pais.toLowerCase().includes('venezuela') ? '#f59e0b' : '#667eea'
+                ),
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: { anchor: 'end', align: 'right', ...datalabelsConfig }
+            },
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
 
 // ===== FUNÇÕES DO RANKING =====
 let rankingData = null;
@@ -1101,6 +1214,54 @@ function renderInsights(data) {
 
     insightsSection.innerHTML = `
         <h2>💡 Insights e Análises Estratégicas</h2>
+
+        <div class="insight-item">
+            <h4>🧓 Perfil de Idosos (60+)</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;">
+                <div style="background:#fef3c7;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#b45309;">${data.totalIdosos}</div>
+                    <div style="font-size:12px;color:#92400e;font-weight:600;">Total Idosos</div>
+                    <div style="font-size:11px;color:#b45309;">${(data.totalIdosos/data.baseAtiva*100).toFixed(1)}% da base</div>
+                </div>
+                <div style="background:#dbeafe;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#1d4ed8;">${data.idososMasc}</div>
+                    <div style="font-size:12px;color:#1e40af;font-weight:600;">Masculino</div>
+                    <div style="font-size:11px;color:#1d4ed8;">${data.totalIdosos > 0 ? (data.idososMasc/data.totalIdosos*100).toFixed(1) : 0}%</div>
+                </div>
+                <div style="background:#fce7f3;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#be185d;">${data.idososFem}</div>
+                    <div style="font-size:12px;color:#9d174d;font-weight:600;">Feminino</div>
+                    <div style="font-size:11px;color:#be185d;">${data.totalIdosos > 0 ? (data.idososFem/data.totalIdosos*100).toFixed(1) : 0}%</div>
+                </div>
+            </div>
+            <p><strong>Faixas etárias:</strong> ${Object.entries(data.idososFaixas).map(([f,v]) => `${f} anos: <strong>${v}</strong>`).join(' · ')}</p>
+            <p style="margin-top:8px;"><strong>Nacionalidade:</strong> ${Object.entries(data.idososNacionalidade).sort((a,b)=>b[1]-a[1]).map(([n,v]) => `${n}: <strong>${v}</strong>`).join(' · ')}</p>
+            <p style="margin-top:10px;">⚠️ <strong>Recomendação:</strong> Idosos representam <strong>${(data.totalIdosos/data.baseAtiva*100).toFixed(1)}%</strong> da base ativa. Garantir condições de acessibilidade, acompanhamento de saúde e atendimento prioritário.</p>
+        </div>
+
+        <div class="insight-item">
+            <h4>♿ Pessoas com Deficiência (PCD)</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;">
+                <div style="background:#ede9fe;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#6d28d9;">${data.totalPCDAtivos}</div>
+                    <div style="font-size:12px;color:#5b21b6;font-weight:600;">Total PCD</div>
+                    <div style="font-size:11px;color:#6d28d9;">${(data.totalPCDAtivos/data.baseAtiva*100).toFixed(1)}% da base</div>
+                </div>
+                <div style="background:#dbeafe;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#1d4ed8;">${data.pcdMasc}</div>
+                    <div style="font-size:12px;color:#1e40af;font-weight:600;">Masculino</div>
+                </div>
+                <div style="background:#fce7f3;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#be185d;">${data.pcdFem}</div>
+                    <div style="font-size:12px;color:#9d174d;font-weight:600;">Feminino</div>
+                </div>
+                <div style="background:#fef3c7;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:24px;font-weight:800;color:#b45309;">${data.pcdIdosos}</div>
+                    <div style="font-size:12px;color:#92400e;font-weight:600;">Idosos PCD</div>
+                </div>
+            </div>
+            <p>⚠️ <strong>Recomendação:</strong> PCDs identificados via campo "Comentários". Garantir adaptações de infraestrutura, atendimento individualizado e encaminhamentos para serviços especializados.</p>
+        </div>
 
         <div class="insight-item">
             <h4>🏠 Análise de Capacidade Operacional</h4>
