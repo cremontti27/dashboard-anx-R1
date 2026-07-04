@@ -157,7 +157,8 @@ body::before {
 }
 
 .upload-icon {
-    font-size: 56px;
+    display: flex;
+    justify-content: center;
     margin-bottom: 18px;
     animation: float 3s ease-in-out infinite;
 }
@@ -194,7 +195,7 @@ input[type="file"] {
 .stat-card {
     background: var(--surface);
     border-radius: var(--radius-md);
-    padding: 26px 28px;
+    padding: 28px 30px;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
@@ -218,32 +219,26 @@ input[type="file"] {
     background: linear-gradient(180deg, var(--avsi-green) 0%, var(--avsi-lime) 100%);
 }
 
-.stat-icon {
-    font-size: 26px;
-    margin-bottom: 12px;
-    opacity: 0.9;
-}
-
 .stat-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: 700;
 }
 
 .stat-value {
     color: var(--ink);
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 800;
-    margin-bottom: 6px;
-    letter-spacing: -0.8px;
+    margin-bottom: 8px;
+    letter-spacing: -0.9px;
 }
 
 .stat-detail {
     color: var(--muted-light);
-    font-size: 12.5px;
+    font-size: 13.5px;
     font-weight: 500;
     line-height: 1.5;
 }
@@ -555,7 +550,7 @@ input[type="file"] {
         <div class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1>📊 Dashboard Pernoite Boa Vista</h1>
+                    <h1>Dashboard Pernoite Boa Vista</h1>
                     <p>AVSI Brasil - Sistema de Análise e Monitoramento</p>
                 </div>
                 <div class="header-badge" id="statusBadge">
@@ -567,9 +562,15 @@ input[type="file"] {
         <div class="error-message" id="errorMessage"></div>
 
         <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
+            <div class="upload-icon">
+                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#00704a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 16V4"/>
+                    <path d="M7 9l5-5 5 5"/>
+                    <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+                </svg>
+            </div>
             <div class="upload-text">Arraste o arquivo Excel ou clique aqui</div>
-            <div class="upload-subtext">Formato aceito: .xlsx exportado do Kobo (abas "Individuos" + "Ativacao", ou o formato antigo "Dias_F1"/"Dias_F4")</div>
+            <div class="upload-subtext">Formato aceito: .xlsx (Pernoite_Boa_Vista_*.xlsx)</div>
             <input type="file" id="fileInput" accept=".xlsx,.xls">
         </div>
 
@@ -594,7 +595,13 @@ input[type="file"] {
                 <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#006847,#00a854,#9ACD32);border-radius:20px 20px 0 0;"></div>
 
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px;">
-                    <div style="width:36px;height:36px;background:linear-gradient(135deg,#006847,#00a854);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚙️</div>
+                    <div style="width:36px;height:36px;background:linear-gradient(135deg,#006847,#00a854);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="#fff" stroke="none"/>
+                            <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#fff" stroke="none"/>
+                            <line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="#fff" stroke="none"/>
+                        </svg>
+                    </div>
                     <div>
                         <h2 style="font-size:18px;font-weight:800;color:#1a202c;margin:0;letter-spacing:-0.3px;">Parâmetros e Filtros</h2>
                         <p style="font-size:12px;color:#a0aec0;margin:0;font-weight:500;">Selecione o período para filtrar os dados do dashboard</p>
@@ -644,7 +651,7 @@ input[type="file"] {
                         style="padding:12px 22px;background:linear-gradient(135deg,#006847 0%,#00a854 100%);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;transition:all 0.25s ease;box-shadow:0 4px 15px rgba(0,104,71,0.35);white-space:nowrap;display:flex;align-items:center;gap:7px;"
                         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(0,104,71,0.5)'"
                         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0,104,71,0.35)'">
-                        🔄 Atualizar
+                        Atualizar
                     </button>
 
                     <!-- Botão Limpar -->
@@ -652,7 +659,7 @@ input[type="file"] {
                         style="padding:12px 18px;background:#f1f5f9;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;transition:all 0.25s ease;white-space:nowrap;display:flex;align-items:center;gap:6px;"
                         onmouseover="this.style.background='#e2e8f0';this.style.borderColor='#cbd5e0';this.style.transform='translateY(-2px)'"
                         onmouseout="this.style.background='#f1f5f9';this.style.borderColor='#e2e8f0';this.style.transform='translateY(0)'">
-                        🗑️ Limpar
+                        Limpar
                     </button>
                 </div>
 
@@ -667,7 +674,7 @@ input[type="file"] {
             <!-- Detalhamento por pessoa -->
             <div class="ranking-section">
                 <button class="ranking-toggle-btn" onclick="toggleRanking()">
-                    📋 Ver Detalhamento por Pessoa
+                    Ver Detalhamento por Pessoa
                 </button>
                 <div class="ranking-container" id="rankingContainer">
                     <h2 style="color: #006847; margin-bottom: 10px;">Frequência de Atendimento por Pessoa</h2>
@@ -694,9 +701,9 @@ input[type="file"] {
 
             <!-- Crédito do Desenvolvedor -->
             <div class="developer-credit">
-                💻 Desenvolvido por <a href="https://www.linkedin.com/in/wellington-rodrigues-sr46/" target="_blank" rel="noopener noreferrer">Wellington Rodrigues</a>
+                Desenvolvido por <a href="https://www.linkedin.com/in/wellington-rodrigues-sr46/" target="_blank" rel="noopener noreferrer">Wellington Rodrigues</a>
                 <br>
-                🤝 Codesenvolvido por <span class="co-developer">Beatriz Cremontti</span>
+                Codesenvolvido por <span class="co-developer">Beatriz Cremontti</span>
             </div>
         </div>
     </div>
@@ -743,7 +750,7 @@ fileInput.addEventListener('change', (e) => {
 });
 
 function showError(message) {
-    errorMessage.textContent = '⚠️ ' + message;
+    errorMessage.textContent = message;
     errorMessage.classList.add('show');
     setTimeout(() => {
         errorMessage.classList.remove('show');
@@ -785,13 +792,13 @@ function processFile(file) {
 
             document.getElementById('loadingIndicator').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('statusBadge').textContent = '✅ Dados carregados';
+            document.getElementById('statusBadge').textContent = 'Dados carregados';
             document.getElementById('statusBadge').style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
         } catch (error) {
             console.error('Erro ao processar arquivo:', error);
             showError('Erro ao processar o arquivo: ' + error.message);
             document.getElementById('loadingIndicator').classList.add('hidden');
-            document.getElementById('statusBadge').textContent = '❌ Erro';
+            document.getElementById('statusBadge').textContent = 'Erro';
             document.getElementById('statusBadge').style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
         }
     };
@@ -932,16 +939,16 @@ function extractData(workbook) {
 
     if (filtroFim) {
         dataReferencia = new Date(filtroFim);
-        console.log('📆 Usando Data Final do filtro de período:', filtroFim);
+        console.log('Usando Data Final do filtro de período:', filtroFim);
     } else {
         dataReferencia = todasDatas.length > 0
             ? new Date(Math.max(...todasDatas.map(d => d.getTime())))
             : new Date();
-        console.log('✅ Usando última data do Excel (recomendado)');
+        console.log('Usando última data do Excel (recomendado)');
     }
 
     dataReferencia.setHours(0, 0, 0, 0);
-    console.log('📅 Data de Referência:', dataReferencia.toLocaleDateString('pt-BR'));
+    console.log('Data de Referência:', dataReferencia.toLocaleDateString('pt-BR'));
 
     const inicioMes = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), 1);
     const fimMes = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth() + 1, 0);
@@ -949,13 +956,13 @@ function extractData(workbook) {
     const janelaDias = 10;
     const limite10Dias = new Date(dataReferencia.getTime() - (janelaDias * 24 * 60 * 60 * 1000));
 
-    console.log('📊 Parâmetros:');
+    console.log('Parâmetros:');
     console.log('   Dias base ativa:', DIAS_BASE_ATIVA);
     console.log('   Janela média recente:', janelaDias, 'dias');
     console.log('   Capacidade:', CAPACIDADE_OPERACIONAL);
     console.log('   Mês de referência:', dataReferencia.toLocaleDateString('pt-BR', {month: 'long', year: 'numeric'}));
-    console.log('📊 Limite 10 dias (média):', limite10Dias.toLocaleDateString('pt-BR'));
-    console.log('📊 Regra base ativa: gap < ' + DIAS_BASE_ATIVA + ' dias');
+    console.log('Limite 10 dias (média):', limite10Dias.toLocaleDateString('pt-BR'));
+    console.log('Regra base ativa: gap < ' + DIAS_BASE_ATIVA + ' dias');
 
     const todasEntradas = entradasBrutas.filter(e => {
         if (!e.data) return false;
@@ -1011,7 +1018,7 @@ function extractData(workbook) {
 
     // DEBUG: Distribuição por GAP
     console.log('\n' + '='.repeat(80));
-    console.log('🔍 DEBUG: DISTRIBUIÇÃO POR GAP (dias sem vir)');
+    console.log('DEBUG: DISTRIBUIÇÃO POR GAP (dias sem vir)');
     console.log('='.repeat(80));
 
     const gapDistribution = {};
@@ -1038,13 +1045,13 @@ function extractData(workbook) {
 
     for (let gap = 0; gap <= 15; gap++) {
         const count = gapDistribution[gap] || 0;
-        const status = gap < DIAS_BASE_ATIVA ? '✅ ATIVO' : '❌ INATIVO';
+        const status = gap < DIAS_BASE_ATIVA ? 'ATIVO' : 'INATIVO';
         if (count > 0) {
             console.log(`${gap.toString().padStart(3)} | ${count.toString().padStart(7)} | ${status}`);
         }
     }
 
-    console.log('\n📊 RESUMO:');
+    console.log('\nRESUMO:');
     console.log(`   Total pessoas únicas: ${Object.keys(entradasPorPessoa).length}`);
     console.log(`   Base ativa (gap < ${DIAS_BASE_ATIVA}): ${baseAtiva.size}`);
     console.log(`   Data referência: ${dataReferencia.toISOString().split('T')[0]}`);
@@ -1307,7 +1314,7 @@ function onFiltroDataChange() {
 
     // Validação: início > fim
     if (inicio && fim && inicio > fim) {
-        infoEl.innerHTML = '⚠️ <strong style="color:#e53e3e">Data inicial não pode ser maior que a data final.</strong>';
+        infoEl.innerHTML = '<strong style="color:#e53e3e">Data inicial não pode ser maior que a data final.</strong>';
         return;
     }
 
@@ -1316,15 +1323,15 @@ function onFiltroDataChange() {
         infoEl.innerHTML = '';
     } else if (inicio && !fim) {
         infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
-            📆 Exibindo a partir de <strong>${inicio.toLocaleDateString('pt-BR')}</strong>
+            Exibindo a partir de <strong>${inicio.toLocaleDateString('pt-BR')}</strong>
         </span>`;
     } else if (!inicio && fim) {
         infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
-            📆 Exibindo até <strong>${fim.toLocaleDateString('pt-BR')}</strong>
+            Exibindo até <strong>${fim.toLocaleDateString('pt-BR')}</strong>
         </span>`;
     } else {
         infoEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,104,71,0.08);border:1px solid rgba(0,104,71,0.2);padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#006847;">
-            📆 Período ativo: <strong>${inicio.toLocaleDateString('pt-BR')}</strong> → <strong>${fim.toLocaleDateString('pt-BR')}</strong>
+            Período ativo: <strong>${inicio.toLocaleDateString('pt-BR')}</strong> → <strong>${fim.toLocaleDateString('pt-BR')}</strong>
         </span>`;
     }
 
@@ -1364,23 +1371,18 @@ function renderDashboard(data) {
 
 function reprocessarDados() {
     if (!workbookGlobal) {
-        alert('⚠️ Faça upload de um arquivo Excel primeiro!');
+        alert('Faça upload de um arquivo Excel primeiro!');
         return;
     }
 
-    console.log('🔄 Reprocessando com novos parâmetros...');
+    console.log('Reprocessando com novos parâmetros...');
     const processedData = extractData(workbookGlobal);
     renderDashboard(processedData);
-    console.log('✅ Dados reprocessados com sucesso!');
+    console.log('Dados reprocessados com sucesso!');
 }
 
 function renderStats(data) {
     const statsGrid = document.getElementById('statsGrid');
-    const capacidadePercent = (data.baseAtiva / CAPACIDADE_OPERACIONAL * 100).toFixed(1);
-
-    let capacidadeClass = 'positive';
-    if (capacidadePercent > 80) capacidadeClass = 'warning';
-    if (capacidadePercent > 95) capacidadeClass = 'critical';
 
     const mediaDiariaPercent = (data.mediaDiaria / CAPACIDADE_OPERACIONAL * 100).toFixed(1);
     let mediaDiariaClass = 'positive';
@@ -1389,67 +1391,55 @@ function renderStats(data) {
 
     const stats = [
         {
-            icon: '📊',
             label: 'Total Histórico',
             value: data.totalHistorico.toLocaleString('pt-BR'),
             detail: 'Pessoas registradas no sistema',
         },
         {
-            icon: '🏠',
             label: 'Capacidade',
             value: CAPACIDADE_OPERACIONAL.toLocaleString('pt-BR'),
             detail: 'Capacidade operacional máxima'
         },
         {
-            icon: '👥',
             label: 'Base Ativa',
             value: data.baseAtiva.toLocaleString('pt-BR'),
             detail: `Não ficaram ${DIAS_BASE_ATIVA} dias completos sem vir`,
-            trend: { text: `${capacidadePercent}% ocupação`, class: capacidadeClass },
-            capacity: capacidadePercent
         },
         {
-            icon: '👨‍👩‍👧‍👦',
             label: 'Famílias Ativas',
             value: data.baseFamilias.toLocaleString('pt-BR'),
             detail: 'Núcleos familiares atendidos',
             trend: { text: `${(data.baseAtiva / data.baseFamilias).toFixed(1)} pessoas/família`, class: 'neutral' }
         },
         {
-            icon: '👶',
             label: 'Crianças Ativas',
             value: data.criancasAtivas.toLocaleString('pt-BR'),
             detail: 'Crianças e adolescentes (0-17 anos)',
             trend: { text: `${(data.criancasAtivas / data.baseAtiva * 100).toFixed(1)}% da base`, class: 'warning' }
         },
         {
-            icon: '📈',
             label: 'Média Diária',
             value: data.mediaDiaria.toLocaleString('pt-BR'),
             detail: `Pessoas por dia · frente a uma capacidade de ${CAPACIDADE_OPERACIONAL.toLocaleString('pt-BR')}`,
             trend: { text: `${mediaDiariaPercent}% da capacidade`, class: mediaDiariaClass }
         },
         {
-            icon: '🛏️',
             label: 'Entradas p/ Pernoite',
-            value: (data.utilizacaoEspaco['Pernoite'] || 0).toLocaleString('pt-BR'),
-            detail: `${data.totalEntradasUtilizacao > 0 ? ((data.utilizacaoEspaco['Pernoite'] || 0) / data.totalEntradasUtilizacao * 100).toFixed(1) : 0}% do total de entradas no período`,
+            value: `${data.totalEntradasUtilizacao > 0 ? ((data.utilizacaoEspaco['Pernoite'] || 0) / data.totalEntradasUtilizacao * 100).toFixed(1) : 0}%`,
+            detail: `${(data.utilizacaoEspaco['Pernoite'] || 0).toLocaleString('pt-BR')} entradas registradas no período`,
         },
         {
-            icon: '🍽️',
             label: 'Entradas p/ Alimentação',
-            value: (data.utilizacaoEspaco['Alimentação'] || 0).toLocaleString('pt-BR'),
-            detail: `${data.totalEntradasUtilizacao > 0 ? ((data.utilizacaoEspaco['Alimentação'] || 0) / data.totalEntradasUtilizacao * 100).toFixed(1) : 0}% do total de entradas no período`,
+            value: `${data.totalEntradasUtilizacao > 0 ? ((data.utilizacaoEspaco['Alimentação'] || 0) / data.totalEntradasUtilizacao * 100).toFixed(1) : 0}%`,
+            detail: `${(data.utilizacaoEspaco['Alimentação'] || 0).toLocaleString('pt-BR')} entradas registradas no período`,
         },
         {
-            icon: '🧓',
             label: 'Idosos Ativos (60+)',
             value: data.totalIdosos.toLocaleString('pt-BR'),
             detail: `♂ ${data.idososMasc} masc · ♀ ${data.idososFem} fem`,
             trend: { text: `${(data.totalIdosos / data.baseAtiva * 100).toFixed(1)}% da base`, class: 'warning' }
         },
         {
-            icon: '♿',
             label: 'PCD Ativos',
             value: data.totalPCDAtivos.toLocaleString('pt-BR'),
             detail: `♂ ${data.pcdMasc} masc · ♀ ${data.pcdFem} fem · ${data.pcdIdosos} idosos`,
@@ -1459,16 +1449,10 @@ function renderStats(data) {
 
     statsGrid.innerHTML = stats.map(stat => `
         <div class="stat-card">
-            <div class="stat-icon">${stat.icon}</div>
             <div class="stat-label">${stat.label}</div>
             <div class="stat-value">${stat.value}</div>
             <div class="stat-detail">${stat.detail}</div>
             ${stat.trend ? `<span class="stat-trend ${stat.trend.class}">${stat.trend.text}</span>` : ''}
-            ${stat.capacity ? `
-                <div class="capacity-indicator">
-                    <div class="capacity-fill ${capacidadeClass}" style="width: ${Math.min(stat.capacity, 100)}%"></div>
-                </div>
-            ` : ''}
         </div>
     `).join('');
 }
@@ -1517,39 +1501,39 @@ function renderCharts(data) {
 
     chartsGrid.innerHTML = `
         <div class="chart-card">
-            <h3>🚻 Distribuição por Sexo</h3>
+            <h3>Distribuição por Sexo</h3>
             <div class="chart-container"><canvas id="sexoChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>🎂 Distribuição por Faixa Etária</h3>
+            <h3>Distribuição por Faixa Etária</h3>
             <div class="chart-container"><canvas id="idadeChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>🌎 Distribuição por Nacionalidade</h3>
+            <h3>Distribuição por Nacionalidade</h3>
             <div class="chart-container"><canvas id="nacionalidadeChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>👤 Perfis</h3>
+            <h3>Perfis</h3>
             <div class="chart-container"><canvas id="perfisChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>⏱️ Tempo de Permanência</h3>
+            <h3>Tempo de Permanência</h3>
             <div class="chart-container"><canvas id="permanenciaChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>📈 Evolução da Base Ativa (6 meses)</h3>
+            <h3>Evolução da Base Ativa (6 meses)</h3>
             <div class="chart-container"><canvas id="evolucaoChart"></canvas></div>
         </div>
         <div class="chart-card" style="grid-column: 1 / -1;">
-            <h3>📊 Tendência de Ocupação (30 dias)</h3>
+            <h3>Tendência de Ocupação (30 dias)</h3>
             <div class="chart-container"><canvas id="tendenciaChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>🧓 Faixas Etárias — Idosos (60+)</h3>
+            <h3>Faixas Etárias — Idosos (60+)</h3>
             <div class="chart-container"><canvas id="idososFaixasChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>🌍 Nacionalidade dos Idosos (60+)</h3>
+            <h3>Nacionalidade dos Idosos (60+)</h3>
             <div class="chart-container"><canvas id="idososNacChart"></canvas></div>
         </div>
     `;
@@ -1874,10 +1858,10 @@ function toggleRanking() {
 
     if (container.classList.contains('show')) {
         container.classList.remove('show');
-        btn.textContent = '📋 Ver Detalhamento por Pessoa';
+        btn.textContent = 'Ver Detalhamento por Pessoa';
     } else {
         container.classList.add('show');
-        btn.textContent = '❌ Fechar Detalhamento';
+        btn.textContent = 'Fechar Detalhamento';
         if (rankingData) {
             renderRanking(rankingData);
         }
@@ -1944,7 +1928,7 @@ function renderRanking(data) {
         `;
     }).join('');
 
-    console.log('📋 Detalhamento por pessoa gerado:', listaPessoas.length, 'pessoas');
+    console.log('Detalhamento por pessoa gerado:', listaPessoas.length, 'pessoas');
 }
 
 function updateLastUpdated(dataReferencia) {
@@ -1960,8 +1944,8 @@ function updateLastUpdated(dataReferencia) {
     const ultimaEntrada = dataReferencia ? dataReferencia.toLocaleDateString('pt-BR') : 'N/A';
 
     document.getElementById('lastUpdated').innerHTML = `
-        📅 <strong>Data de Referência dos Dados:</strong> ${ultimaEntrada} (última entrada no Excel)<br>
-        🕐 <strong>Dashboard processado em:</strong> ${processado}
+        <strong>Data de Referência dos Dados:</strong> ${ultimaEntrada} (última entrada no Excel)<br>
+        <strong>Dashboard processado em:</strong> ${processado}
     `;
 }
 
