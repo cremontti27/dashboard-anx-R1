@@ -476,6 +476,7 @@ input[type="file"] {
     background: rgba(0, 88, 58, 0.28);
     border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.16);
+    line-height: 2.1;
 }
 
 .developer-credit a {
@@ -489,6 +490,11 @@ input[type="file"] {
 .developer-credit a:hover {
     color: #FFF;
     border-bottom: 2px solid #FFD700;
+}
+
+.developer-credit .co-developer {
+    color: #FFD700;
+    font-weight: 700;
 }
 
 .ranking-section {
@@ -819,6 +825,8 @@ input[type="file"] {
             <!-- Crédito do Desenvolvedor -->
             <div class="developer-credit">
                 💻 Desenvolvido por <a href="https://www.linkedin.com/in/wellington-rodrigues-sr46/" target="_blank" rel="noopener noreferrer">Wellington Rodrigues</a>
+                <br>
+                🤝 Codesenvolvido por <span class="co-developer">Beatriz Cremontti</span>
             </div>
         </div>
     </div>
@@ -930,6 +938,49 @@ function normalizarNumero(valor) {
     return isNaN(n) ? 0 : n;
 }
 
+// Mapa de variações comuns (grafia/idioma) para o nome canônico em português.
+// Isso evita que "Russo", "Russa", "Rússia" ou "Nigeria"/"Nigéria" virem categorias separadas.
+const MAPA_NACIONALIDADES = {
+    'russo': 'Rússia', 'russa': 'Rússia', 'russia': 'Rússia', 'rússia': 'Rússia',
+    'nigeria': 'Nigéria', 'nigéria': 'Nigéria', 'nigeriano': 'Nigéria', 'nigeriana': 'Nigéria',
+    'africa do sul': 'África do Sul', 'áfrica do sul': 'África do Sul', 'sul africano': 'África do Sul', 'sul africana': 'África do Sul',
+    'republica dominicana': 'República Dominicana', 'república dominicana': 'República Dominicana', 'dominicano': 'República Dominicana', 'dominicana': 'República Dominicana',
+    'haiti': 'Haiti', 'haitiano': 'Haiti', 'haitiana': 'Haiti',
+    'guiana': 'Guiana', 'guianes': 'Guiana', 'guianense': 'Guiana',
+    'alemanha': 'Alemanha', 'alemao': 'Alemanha', 'alemão': 'Alemanha', 'alema': 'Alemanha',
+    'serra leoa': 'Serra Leoa', 'serra-leoa': 'Serra Leoa',
+    'colombia': 'Colômbia', 'colômbia': 'Colômbia', 'colombiano': 'Colômbia', 'colombiana': 'Colômbia',
+    'venezuela': 'Venezuela', 'venezuelano': 'Venezuela', 'venezuelana': 'Venezuela',
+    'cuba': 'Cuba', 'cubano': 'Cuba', 'cubana': 'Cuba',
+    'peru': 'Peru', 'peruano': 'Peru', 'peruana': 'Peru',
+    'equador': 'Equador', 'equatoriano': 'Equador', 'equatoriana': 'Equador',
+    'argentina': 'Argentina', 'argentino': 'Argentina',
+    'chile': 'Chile', 'chileno': 'Chile', 'chilena': 'Chile',
+    'brasil': 'Brasil', 'brasileiro': 'Brasil', 'brasileira': 'Brasil'
+};
+
+function normalizarNomePais(nome) {
+    const chave = String(nome).trim().toLowerCase();
+    if (MAPA_NACIONALIDADES[chave]) return MAPA_NACIONALIDADES[chave];
+    // Sem correspondência conhecida: aplica Title Case simples
+    return String(nome).trim().split(/\s+/)
+        .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+        .join(' ');
+}
+
+// Resolve a nacionalidade real de um indivíduo: quando o campo principal
+// está marcado como "Outro/Outra/Outros", usa a coluna de especificação do país.
+function resolverNacionalidade(individuo, colunaNacionalidade, colunaOutraNacionalidade) {
+    const valorBruto = individuo[colunaNacionalidade];
+    if (!valorBruto) return 'Não informado';
+
+    const ehOutro = /^outr[oa]s?$/i.test(String(valorBruto).trim());
+    if (ehOutro && colunaOutraNacionalidade && individuo[colunaOutraNacionalidade]) {
+        return normalizarNomePais(individuo[colunaOutraNacionalidade]);
+    }
+    return valorBruto;
+}
+
 function extractData(workbook) {
     const mainSheetName = workbook.SheetNames[0];
     const mainSheet = XLSX.utils.sheet_to_json(workbook.Sheets[mainSheetName]);
@@ -974,7 +1025,12 @@ function extractData(workbook) {
     }
 
     // Detectar nome da coluna de nacionalidade (pode variar entre versões do formulário)
-    const colunasPossiveis = Object.keys(individuosSheet[0] || {});
+    // IMPORTANTE: usamos a UNIÃO das chaves de todas as linhas, não apenas a primeira —
+    // colunas esparsas como "Outra nacionalidade" só aparecem nas linhas onde há valor,
+    // então olhar só a linha 0 pode não detectá-las.
+    const setColunas = new Set();
+    individuosSheet.forEach(r => Object.keys(r).forEach(k => setColunas.add(k)));
+    const colunasPossiveis = Array.from(setColunas);
     const colunaNacionalidade = colunasPossiveis.includes('Nacionalidade')
         ? 'Nacionalidade'
         : (colunasPossiveis.find(col =>
@@ -983,7 +1039,20 @@ function extractData(workbook) {
             col.toLowerCase().includes('pais')
         ) || '__field_7__');
 
-    console.log('Coluna de nacionalidade detectada:', colunaNacionalidade);
+    // Coluna que especifica o país quando "Nacionalidade" = Outro/Outra/Outros
+    const colunaOutraNacionalidade = colunasPossiveis.find(col =>
+        col !== colunaNacionalidade &&
+        col.toLowerCase().includes('outr') &&
+        (col.toLowerCase().includes('nacional') || col.toLowerCase().includes('país') || col.toLowerCase().includes('pais'))
+    );
+
+    console.log('Coluna de nacionalidade detectada:', colunaNacionalidade, '| Coluna "outra nacionalidade":', colunaOutraNacionalidade);
+
+    // Anexa a nacionalidade já resolvida (usando a coluna "Outra" quando o valor principal é "Outro/Outra/Outros")
+    // a cada indivíduo, para uso consistente em todos os gráficos, insights e no ranking.
+    individuosSheet.forEach(ind => {
+        ind._nacionalidadeResolvida = resolverNacionalidade(ind, colunaNacionalidade, colunaOutraNacionalidade);
+    });
 
     const todasDatas = entradasBrutas.map(d => d.data).filter(d => d !== null);
 
@@ -1175,7 +1244,7 @@ function extractData(workbook) {
 
     const nacionalidadeData = {};
     individuosAtivos.forEach(ind => {
-        const nac = ind[colunaNacionalidade] || 'Não informado';
+        const nac = ind._nacionalidadeResolvida || 'Não informado';
         nacionalidadeData[nac] = (nacionalidadeData[nac] || 0) + 1;
     });
 
@@ -1250,7 +1319,7 @@ function extractData(workbook) {
     const idososFem  = idososAtivos.filter(ind => ind.Sexo === 'Feminino').length;
     const idososNacionalidade = {};
     idososAtivos.forEach(ind => {
-        const nac = ind.Nacionalidade || 'Não informado';
+        const nac = ind._nacionalidadeResolvida || 'Não informado';
         idososNacionalidade[nac] = (idososNacionalidade[nac] || 0) + 1;
     });
     const idososFaixas = { '60-64': 0, '65-69': 0, '70-74': 0, '75-79': 0, '80+': 0 };
@@ -1444,7 +1513,10 @@ function renderStats(data) {
     if (capacidadePercent > 80) capacidadeClass = 'warning';
     if (capacidadePercent > 95) capacidadeClass = 'critical';
 
-    const percVenezuelanos = (data.venezuelanosAtivos / data.baseAtiva * 100).toFixed(1);
+    const mediaDiariaPercent = (data.mediaDiaria / CAPACIDADE_OPERACIONAL * 100).toFixed(1);
+    let mediaDiariaClass = 'positive';
+    if (mediaDiariaPercent > 80) mediaDiariaClass = 'warning';
+    if (mediaDiariaPercent > 95) mediaDiariaClass = 'critical';
 
     const stats = [
         {
@@ -1454,19 +1526,18 @@ function renderStats(data) {
             detail: 'Pessoas registradas no sistema',
         },
         {
+            icon: '🏠',
+            label: 'Capacidade',
+            value: CAPACIDADE_OPERACIONAL.toLocaleString('pt-BR'),
+            detail: 'Capacidade operacional máxima'
+        },
+        {
             icon: '👥',
             label: 'Base Ativa',
             value: data.baseAtiva.toLocaleString('pt-BR'),
             detail: `Não ficaram ${DIAS_BASE_ATIVA} dias completos sem vir`,
             trend: { text: `${capacidadePercent}% ocupação`, class: capacidadeClass },
             capacity: capacidadePercent
-        },
-        {
-            icon: '🇻🇪',
-            label: 'Venezuelanos Ativos',
-            value: data.venezuelanosAtivos.toLocaleString('pt-BR'),
-            detail: 'Elegíveis para Operação Acolhida',
-            trend: { text: `${percVenezuelanos}% da base`, class: 'warning' }
         },
         {
             icon: '👨‍👩‍👧‍👦',
@@ -1489,28 +1560,11 @@ function renderStats(data) {
             detail: 'Pessoas com presença no mês atual',
         },
         {
-            icon: '🆕',
-            label: 'Novos no Mês',
-            value: data.entradasNoMes.toLocaleString('pt-BR'),
-            detail: 'Primeira entrada no mês',
-        },
-        {
             icon: '📈',
             label: 'Média Diária',
             value: data.mediaDiaria.toLocaleString('pt-BR'),
-            detail: 'Pessoas por dia (período completo)',
-        },
-        {
-            icon: '⏱️',
-            label: 'Média 10 Dias',
-            value: data.media10Dias.toLocaleString('pt-BR'),
-            detail: 'Pessoas por dia (últimos 10 dias)',
-        },
-        {
-            icon: '🏠',
-            label: 'Capacidade',
-            value: CAPACIDADE_OPERACIONAL.toLocaleString('pt-BR'),
-            detail: 'Capacidade operacional máxima'
+            detail: `Pessoas por dia · frente a uma capacidade de ${CAPACIDADE_OPERACIONAL.toLocaleString('pt-BR')}`,
+            trend: { text: `${mediaDiariaPercent}% da capacidade`, class: mediaDiariaClass }
         },
         {
             icon: '🛏️',
@@ -1993,7 +2047,7 @@ function calculateRanking(data) {
             nome: individuo['Nome completo'] || 'Não informado',
             grupo: individuo['Relação'] || individuo['Perfil'] || 'N/A',
             idade: individuo.idade_anos || 0,
-            nacionalidade: individuo.Nacionalidade || 'Não informada',
+            nacionalidade: individuo._nacionalidadeResolvida || 'Não informada',
             diasAtivo: diasUnicos.size
         });
     });
@@ -2061,25 +2115,9 @@ function renderInsights(data) {
     const percMulheresDesacomp = (mulheresDesacomp / data.baseAtiva * 100).toFixed(1);
     const percFamiliasCriancas = (familiasCriancas / data.baseAtiva * 100).toFixed(1);
 
-    const taxaOcupacao = (data.baseAtiva / CAPACIDADE_OPERACIONAL * 100).toFixed(1);
-    let statusCapacidade = 'normal';
-    let messageCapacidade = 'dentro dos parâmetros normais';
-    if (taxaOcupacao > 80) {
-        statusCapacidade = 'alerta';
-        messageCapacidade = 'próximo ao limite da capacidade';
-    }
-    if (taxaOcupacao > 95) {
-        statusCapacidade = 'crítico';
-        messageCapacidade = 'em capacidade crítica';
-    }
-
     const totalEntradasUtil = data.totalEntradasUtilizacao || 0;
     const pernoitePercent = (totalEntradasUtil > 0 ? (data.utilizacaoEspaco['Pernoite'] || 0) / totalEntradasUtil * 100 : 0).toFixed(1);
     const alimentacaoPercent = (totalEntradasUtil > 0 ? (data.utilizacaoEspaco['Alimentação'] || 0) / totalEntradasUtil * 100 : 0).toFixed(1);
-
-    const percVenezuelanos = (data.venezuelanosAtivos / data.baseAtiva * 100).toFixed(1);
-    const naoVenezuelanos = data.baseAtiva - data.venezuelanosAtivos;
-    const percNaoVenezuelanos = (naoVenezuelanos / data.baseAtiva * 100).toFixed(1);
 
     insightsSection.innerHTML = `
         <h2>💡 Insights e Análises Estratégicas</h2>
@@ -2133,28 +2171,6 @@ function renderInsights(data) {
         </div>
 
         <div class="insight-item">
-            <h4>🏠 Análise de Capacidade Operacional</h4>
-            <p>O abrigo está operando com <strong>${taxaOcupacao}% de sua capacidade</strong> (${data.baseAtiva} de ${CAPACIDADE_OPERACIONAL} pessoas),
-            ${messageCapacidade}. ${statusCapacidade === 'crítico' ? '⚠️ <strong>Atenção:</strong> considere medidas para redistribuição ou expansão temporária da capacidade.' :
-            statusCapacidade === 'alerta' ? '⚠️ <strong>Monitoramento necessário:</strong> acompanhar de perto a entrada de novas pessoas.' : '✅ Capacidade adequada para operação normal.'}</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>🇻🇪 Análise de Elegibilidade para Abrigamento - Operação Acolhida</h4>
-            <div class="venezuelan-highlight">
-                <h5>🎯 INSIGHT CRÍTICO: Foco em Venezuelanos</h5>
-                <p>Apenas <strong>cidadãos venezuelanos</strong> são elegíveis para abrigamento através da <strong>Operação Acolhida</strong>.
-                Atualmente, <strong>${data.venezuelanosAtivos} pessoas (${percVenezuelanos}%)</strong> da base ativa são venezuelanas e
-                <strong>elegíveis para encaminhamento ao programa de interiorização e abrigamento</strong>.</p>
-            </div>
-            <p style="margin-top: 15px;">Os <strong>${naoVenezuelanos} indivíduos (${percNaoVenezuelanos}%)</strong> de outras nacionalidades
-            <strong>NÃO são elegíveis</strong> para a Operação Acolhida e necessitam de <strong>estratégias alternativas</strong> de apoio:
-            parcerias com órgãos municipais, estaduais, organizações não-governamentais e programas de integração local.</p>
-            <p style="margin-top: 10px;"><strong>📋 Recomendação:</strong> Priorizar mapeamento e encaminhamento ativo dos ${data.venezuelanosAtivos} venezuelanos
-            para processos de documentação, interiorização e abrigamento permanente através da rede da Operação Acolhida.</p>
-        </div>
-
-        <div class="insight-item">
             <h4>👥 Perfil Demográfico e Etário</h4>
             <p>A idade média da base ativa é <strong>${idadeMedia.toFixed(1)} anos</strong>, com predominância da faixa etária
             <strong>${faixaPredominante[0]} anos</strong> (${faixaPredominante[1]} pessoas, <strong>${(faixaPredominante[1]/data.baseAtiva*100).toFixed(1)}%</strong>).
@@ -2205,23 +2221,6 @@ function renderInsights(data) {
             `está <strong>estável</strong> em relação à média histórica (${data.mediaDiaria}), indicando demanda consistente.`}</p>
         </div>
 
-        <div class="insight-item">
-            <h4>🎯 Estratégias Recomendadas para Abrigamento</h4>
-            <p><strong>Para venezuelanos (${percVenezuelanos}% da base):</strong></p>
-            <ul style="margin: 10px 0 10px 20px; line-height: 1.8;">
-                <li>✅ Articulação imediata com pontos focais da <strong>Operação Acolhida</strong></li>
-                <li>📋 Regularização documental (CPF, Carteira de Trabalho, RG)</li>
-                <li>🚌 Processos de interiorização para outros estados</li>
-                <li>🏘️ Encaminhamento para abrigos da rede federal</li>
-            </ul>
-            <p style="margin-top: 10px;"><strong>Para outras nacionalidades (${percNaoVenezuelanos}%):</strong></p>
-            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                <li>🤝 Parcerias com Secretarias Municipais de Assistência Social</li>
-                <li>🏛️ Articulação com Sistema Único de Assistência Social (SUAS)</li>
-                <li>🌐 ONGs e organizações internacionais (ACNUR, OIM, Cáritas)</li>
-                <li>💼 Programas de qualificação profissional e empregabilidade</li>
-            </ul>
-        </div>
     `;
 }
 
