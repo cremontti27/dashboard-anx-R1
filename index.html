@@ -334,54 +334,6 @@ input[type="file"] {
     height: 310px;
 }
 
-.insights-section {
-    background: var(--surface);
-    border-radius: var(--radius-md);
-    padding: 36px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border);
-}
-
-.insights-section h2 {
-    color: var(--ink);
-    font-size: 22px;
-    margin-bottom: 24px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-}
-
-.insight-item {
-    padding: 22px 24px;
-    margin-bottom: 16px;
-    border-left: 4px solid var(--avsi-green-mid);
-    background: #f4faf6;
-    border-radius: var(--radius-sm);
-    transition: all 0.25s ease;
-}
-
-.insight-item:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 16px rgba(0, 112, 74, 0.12);
-}
-
-.insight-item h4 {
-    color: var(--ink);
-    font-size: 16.5px;
-    margin-bottom: 10px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-
-.insight-item p {
-    color: var(--ink-soft);
-    font-size: 14.5px;
-    line-height: 1.65;
-    font-weight: 500;
-}
-
 .loading {
     text-align: center;
     padding: 60px;
@@ -410,50 +362,6 @@ input[type="file"] {
 
 .hidden {
     display: none;
-}
-
-.profile-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 18px;
-    margin-top: 18px;
-}
-
-.profile-item {
-    background: #fbfcfd;
-    padding: 18px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    text-align: center;
-    transition: all 0.25s ease;
-}
-
-.profile-item:hover {
-    border-color: var(--avsi-green-mid);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 112, 74, 0.12);
-}
-
-.profile-item .profile-label {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 8px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-}
-
-.profile-item .profile-value {
-    color: var(--ink);
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.profile-item .profile-percent {
-    color: var(--avsi-green-mid);
-    font-size: 15px;
-    font-weight: 700;
 }
 
 .last-updated {
@@ -503,8 +411,8 @@ input[type="file"] {
 }
 
 .ranking-toggle-btn {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    color: #1a202c;
+    background: linear-gradient(135deg, var(--avsi-green) 0%, var(--avsi-green-mid) 100%);
+    color: white;
     padding: 14px 36px;
     border: none;
     border-radius: var(--radius-sm);
@@ -512,12 +420,12 @@ input[type="file"] {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 6px 16px rgba(255, 165, 0, 0.28);
+    box-shadow: 0 6px 16px rgba(0, 112, 74, 0.28);
 }
 
 .ranking-toggle-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(255, 165, 0, 0.36);
+    box-shadow: 0 10px 24px rgba(0, 112, 74, 0.36);
 }
 
 .ranking-container {
@@ -580,22 +488,6 @@ input[type="file"] {
     border-bottom: none;
 }
 
-.rank-badge {
-    display: inline-block;
-    background: #eef2f5;
-    color: var(--ink-soft);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 11.5px;
-}
-
-.rank-badge.top3 {
-    background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-    color: #1a202c;
-    box-shadow: 0 2px 8px rgba(255, 165, 0, 0.3);
-}
-
 .grupo-badge {
     display: inline-block;
     padding: 4px 8px;
@@ -632,27 +524,6 @@ input[type="file"] {
 
 .error-message.show {
     display: block;
-}
-
-.venezuelan-highlight {
-    background: #fdf6e6;
-    border-left: 4px solid #e6a723;
-    padding: 18px 20px;
-    border-radius: var(--radius-sm);
-    margin-top: 18px;
-}
-
-.venezuelan-highlight h5 {
-    color: #8a5a10;
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 8px;
-}
-
-.venezuelan-highlight p {
-    color: #6b4a15;
-    font-size: 13.5px;
-    line-height: 1.6;
 }
 
 @media (max-width: 768px) {
@@ -791,27 +662,26 @@ input[type="file"] {
 
             <div class="stats-grid" id="statsGrid"></div>
             <div class="charts-grid" id="chartsGrid"></div>
-            <div class="insights-section" id="insightsSection"></div>
             <div class="last-updated" id="lastUpdated"></div>
 
-            <!-- Ranking Top 50 -->
+            <!-- Detalhamento por pessoa -->
             <div class="ranking-section">
                 <button class="ranking-toggle-btn" onclick="toggleRanking()">
-                    📈 Ver Ranking 50+ Ativos
+                    📋 Ver Detalhamento por Pessoa
                 </button>
                 <div class="ranking-container" id="rankingContainer">
-                    <h2 style="color: #006847; margin-bottom: 10px;">🏆 Top 50 Pessoas Mais Ativas</h2>
-                    <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">Ranking baseado no número de dias com presença registrada</p>
+                    <h2 style="color: #006847; margin-bottom: 10px;">Frequência de Atendimento por Pessoa</h2>
+                    <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">Pessoas da base ativa, listadas pelo número de dias com presença registrada</p>
                     <div style="overflow-x: auto;">
                         <table class="ranking-table" id="rankingTable">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>Nº</th>
                                     <th>Nome</th>
                                     <th>Grupo</th>
                                     <th>Idade</th>
                                     <th>Nacionalidade</th>
-                                    <th>Dias Ativo</th>
+                                    <th>Dias com Presença</th>
                                 </tr>
                             </thead>
                             <tbody id="rankingBody">
@@ -1488,7 +1358,6 @@ function limparFiltrosPeriodo() {
 function renderDashboard(data) {
     renderStats(data);
     renderCharts(data);
-    renderInsights(data);
     updateLastUpdated(data.dataReferencia);
     rankingData = data;
 }
@@ -1552,12 +1421,6 @@ function renderStats(data) {
             value: data.criancasAtivas.toLocaleString('pt-BR'),
             detail: 'Crianças e adolescentes (0-17 anos)',
             trend: { text: `${(data.criancasAtivas / data.baseAtiva * 100).toFixed(1)}% da base`, class: 'warning' }
-        },
-        {
-            icon: '📅',
-            label: 'Ativos no Mês',
-            value: data.ativosNoMes.toLocaleString('pt-BR'),
-            detail: 'Pessoas com presença no mês atual',
         },
         {
             icon: '📈',
@@ -1666,7 +1529,7 @@ function renderCharts(data) {
             <div class="chart-container"><canvas id="nacionalidadeChart"></canvas></div>
         </div>
         <div class="chart-card">
-            <h3>👤 Top 6 Perfis mais Comuns</h3>
+            <h3>👤 Perfis</h3>
             <div class="chart-container"><canvas id="perfisChart"></canvas></div>
         </div>
         <div class="chart-card">
@@ -2002,7 +1865,7 @@ function renderCharts(data) {
     });
 }
 
-// ===== FUNÇÕES DO RANKING =====
+// ===== FUNÇÕES DE DETALHAMENTO POR PESSOA =====
 let rankingData = null;
 
 function toggleRanking() {
@@ -2011,10 +1874,10 @@ function toggleRanking() {
 
     if (container.classList.contains('show')) {
         container.classList.remove('show');
-        btn.textContent = '📈 Ver Ranking 50+ Ativos';
+        btn.textContent = '📋 Ver Detalhamento por Pessoa';
     } else {
         container.classList.add('show');
-        btn.textContent = '❌ Fechar Ranking';
+        btn.textContent = '❌ Fechar Detalhamento';
         if (rankingData) {
             renderRanking(rankingData);
         }
@@ -2058,12 +1921,10 @@ function calculateRanking(data) {
 
 function renderRanking(data) {
     const rankingBody = document.getElementById('rankingBody');
-    const top50 = calculateRanking(data);
+    const listaPessoas = calculateRanking(data);
 
-    rankingBody.innerHTML = top50.map((pessoa, index) => {
-        const rank = index + 1;
-        const isTop3 = rank <= 3;
-        const rankClass = isTop3 ? 'rank-badge top3' : 'rank-badge';
+    rankingBody.innerHTML = listaPessoas.map((pessoa, index) => {
+        const numero = index + 1;
 
         let grupoClass = '';
         const grupoUpper = pessoa.grupo.toUpperCase();
@@ -2073,7 +1934,7 @@ function renderRanking(data) {
 
         return `
             <tr>
-                <td><span class="${rankClass}">${rank}º</span></td>
+                <td style="color: #a0aec0;">${numero}</td>
                 <td style="font-weight: 600; color: #1a202c;">${pessoa.nome}</td>
                 <td><span class="grupo-badge ${grupoClass}">${pessoa.grupo}</span></td>
                 <td>${pessoa.idade} anos</td>
@@ -2083,145 +1944,7 @@ function renderRanking(data) {
         `;
     }).join('');
 
-    console.log('🏆 Ranking Top 50 gerado:', top50.length, 'pessoas');
-}
-
-function renderInsights(data) {
-    const insightsSection = document.getElementById('insightsSection');
-
-    const idadeMedia = data.individuosAtivos.reduce((sum, ind) => sum + (ind.idade_anos || 0), 0) / data.individuosAtivos.length;
-
-    const faixasCount = {
-        '0-12': 0, '13-17': 0, '18-30': 0, '31-45': 0, '46-60': 0, '60+': 0
-    };
-    data.individuosAtivos.forEach(ind => {
-        const idade = ind.idade_anos;
-        if (idade <= 12) faixasCount['0-12']++;
-        else if (idade <= 17) faixasCount['13-17']++;
-        else if (idade <= 30) faixasCount['18-30']++;
-        else if (idade <= 45) faixasCount['31-45']++;
-        else if (idade <= 60) faixasCount['46-60']++;
-        else faixasCount['60+']++;
-    });
-    const faixaPredominante = Object.entries(faixasCount).sort((a, b) => b[1] - a[1])[0];
-
-    const homensDesacomp = data.registrosAtivos.filter(r => r.Perfil === 'HD - Homem Desacompanhado').length;
-    const mulheresDesacomp = data.registrosAtivos.filter(r => r.Perfil === 'MD - Mulher Desacompanhada').length;
-    const familiasCriancas = data.registrosAtivos.filter(r =>
-        r.Perfil && (r.Perfil.includes('Criança') || r.Perfil.includes('FMC') || r.Perfil.includes('FPC'))
-    ).length;
-
-    const percHomensDesacomp = (homensDesacomp / data.baseAtiva * 100).toFixed(1);
-    const percMulheresDesacomp = (mulheresDesacomp / data.baseAtiva * 100).toFixed(1);
-    const percFamiliasCriancas = (familiasCriancas / data.baseAtiva * 100).toFixed(1);
-
-    const totalEntradasUtil = data.totalEntradasUtilizacao || 0;
-    const pernoitePercent = (totalEntradasUtil > 0 ? (data.utilizacaoEspaco['Pernoite'] || 0) / totalEntradasUtil * 100 : 0).toFixed(1);
-    const alimentacaoPercent = (totalEntradasUtil > 0 ? (data.utilizacaoEspaco['Alimentação'] || 0) / totalEntradasUtil * 100 : 0).toFixed(1);
-
-    insightsSection.innerHTML = `
-        <h2>💡 Insights e Análises Estratégicas</h2>
-
-        <div class="insight-item">
-            <h4>🧓 Perfil de Idosos (60+)</h4>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;">
-                <div style="background:#fef3c7;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#b45309;">${data.totalIdosos}</div>
-                    <div style="font-size:12px;color:#92400e;font-weight:600;">Total Idosos</div>
-                    <div style="font-size:11px;color:#b45309;">${(data.totalIdosos/data.baseAtiva*100).toFixed(1)}% da base</div>
-                </div>
-                <div style="background:#dbeafe;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#1d4ed8;">${data.idososMasc}</div>
-                    <div style="font-size:12px;color:#1e40af;font-weight:600;">Masculino</div>
-                    <div style="font-size:11px;color:#1d4ed8;">${data.totalIdosos > 0 ? (data.idososMasc/data.totalIdosos*100).toFixed(1) : 0}%</div>
-                </div>
-                <div style="background:#fce7f3;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#be185d;">${data.idososFem}</div>
-                    <div style="font-size:12px;color:#9d174d;font-weight:600;">Feminino</div>
-                    <div style="font-size:11px;color:#be185d;">${data.totalIdosos > 0 ? (data.idososFem/data.totalIdosos*100).toFixed(1) : 0}%</div>
-                </div>
-            </div>
-            <p><strong>Faixas etárias:</strong> ${Object.entries(data.idososFaixas).map(([f,v]) => `${f} anos: <strong>${v}</strong>`).join(' · ')}</p>
-            <p style="margin-top:8px;"><strong>Nacionalidade:</strong> ${Object.entries(data.idososNacionalidade).sort((a,b)=>b[1]-a[1]).map(([n,v]) => `${n}: <strong>${v}</strong>`).join(' · ')}</p>
-            <p style="margin-top:10px;">⚠️ <strong>Recomendação:</strong> Idosos representam <strong>${(data.totalIdosos/data.baseAtiva*100).toFixed(1)}%</strong> da base ativa. Garantir condições de acessibilidade, acompanhamento de saúde e atendimento prioritário.</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>♿ Pessoas com Deficiência (PCD)</h4>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;">
-                <div style="background:#ede9fe;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#6d28d9;">${data.totalPCDAtivos}</div>
-                    <div style="font-size:12px;color:#5b21b6;font-weight:600;">Total PCD</div>
-                    <div style="font-size:11px;color:#6d28d9;">${(data.totalPCDAtivos/data.baseAtiva*100).toFixed(1)}% da base</div>
-                </div>
-                <div style="background:#dbeafe;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#1d4ed8;">${data.pcdMasc}</div>
-                    <div style="font-size:12px;color:#1e40af;font-weight:600;">Masculino</div>
-                </div>
-                <div style="background:#fce7f3;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#be185d;">${data.pcdFem}</div>
-                    <div style="font-size:12px;color:#9d174d;font-weight:600;">Feminino</div>
-                </div>
-                <div style="background:#fef3c7;border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:24px;font-weight:800;color:#b45309;">${data.pcdIdosos}</div>
-                    <div style="font-size:12px;color:#92400e;font-weight:600;">Idosos PCD</div>
-                </div>
-            </div>
-            <p>⚠️ <strong>Recomendação:</strong> PCDs identificados via campo "Comentários". Garantir adaptações de infraestrutura, atendimento individualizado e encaminhamentos para serviços especializados.</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>👥 Perfil Demográfico e Etário</h4>
-            <p>A idade média da base ativa é <strong>${idadeMedia.toFixed(1)} anos</strong>, com predominância da faixa etária
-            <strong>${faixaPredominante[0]} anos</strong> (${faixaPredominante[1]} pessoas, <strong>${(faixaPredominante[1]/data.baseAtiva*100).toFixed(1)}%</strong>).
-            Isso indica ${idadeMedia < 35 ? 'uma população relativamente jovem, demandando programas de capacitação profissional e inserção no mercado de trabalho' :
-            'uma população com idade mais avançada, requerendo atenção especial à saúde e condições de acessibilidade'}.</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>👨‍👩‍👧‍👦 Composição e Perfis Familiares</h4>
-            <div class="profile-grid">
-                <div class="profile-item">
-                    <div class="profile-label">👨 Homens Desacompanhados</div>
-                    <div class="profile-value">${homensDesacomp}</div>
-                    <div class="profile-percent">${percHomensDesacomp}%</div>
-                </div>
-                <div class="profile-item">
-                    <div class="profile-label">👩 Mulheres Desacompanhadas</div>
-                    <div class="profile-value">${mulheresDesacomp}</div>
-                    <div class="profile-percent">${percMulheresDesacomp}%</div>
-                </div>
-                <div class="profile-item">
-                    <div class="profile-label">👨‍👩‍👧 Famílias com Crianças</div>
-                    <div class="profile-value">${familiasCriancas}</div>
-                    <div class="profile-percent">${percFamiliasCriancas}%</div>
-                </div>
-            </div>
-            <p style="margin-top: 20px;">O perfil predominante é de <strong>pessoas desacompanhadas (${(parseFloat(percHomensDesacomp) + parseFloat(percMulheresDesacomp)).toFixed(1)}%)</strong>,
-            sugerindo ${familiasCriancas > 0 ? 'a necessidade de estratégias diferenciadas: programas de reinserção individual e suporte familiar específico' :
-            'foco em programas de reinserção social e autonomia individual'}.</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>🛏️🍽️ Padrões de Utilização dos Serviços</h4>
-            <p><strong>${pernoitePercent}%</strong> das entradas registradas no período são para <strong>pernoite completo</strong>, enquanto
-            <strong>${alimentacaoPercent}%</strong> são apenas para <strong>alimentação</strong>.
-            ${parseFloat(alimentacaoPercent) > 25 ?
-            '⚠️ <strong>Insight:</strong> Demanda significativa por alimentação sem pernoite indica vulnerabilidade alimentar na comunidade local. Considere expandir programas de segurança alimentar.' :
-            '✅ <strong>Insight:</strong> Maioria utiliza serviço completo, indicando situação de vulnerabilidade habitacional. Priorize programas de moradia.'}</p>
-        </div>
-
-        <div class="insight-item">
-            <h4>📈 Tendência e Dinâmica de Frequência</h4>
-            <p>A média de <strong>${data.media10Dias} pessoas/dia</strong> nos últimos 10 dias
-            ${data.media10Dias > data.mediaDiaria ?
-            `está <strong>${((data.media10Dias / data.mediaDiaria - 1) * 100).toFixed(1)}% acima</strong> da média histórica (${data.mediaDiaria}), indicando <strong>tendência de crescimento</strong> na demanda. 📊 <strong>Recomendação:</strong> Preparar infraestrutura para possível aumento sustentado.` :
-            data.media10Dias < data.mediaDiaria ?
-            `está <strong>${((1 - data.media10Dias / data.mediaDiaria) * 100).toFixed(1)}% abaixo</strong> da média histórica (${data.mediaDiaria}), indicando <strong>estabilização ou redução temporária</strong>. Momento propício para otimização de recursos.` :
-            `está <strong>estável</strong> em relação à média histórica (${data.mediaDiaria}), indicando demanda consistente.`}</p>
-        </div>
-
-    `;
+    console.log('📋 Detalhamento por pessoa gerado:', listaPessoas.length, 'pessoas');
 }
 
 function updateLastUpdated(dataReferencia) {
