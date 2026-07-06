@@ -326,7 +326,7 @@ input[type="file"] {
 
 .chart-container {
     position: relative;
-    height: 310px;
+    height: 330px;
 }
 
 .loading {
@@ -1456,7 +1456,6 @@ function renderStats(data) {
             label: 'Famílias Ativas',
             value: data.baseFamilias.toLocaleString('pt-BR'),
             detail: 'Núcleos familiares atendidos',
-            trend: { text: `${(data.baseAtiva / data.baseFamilias).toFixed(1)} pessoas/família`, class: 'neutral' }
         },
         {
             label: 'Crianças Ativas',
@@ -1597,15 +1596,32 @@ function renderCharts(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: 10 },
             plugins: {
-                legend: { position: 'bottom', labels: { padding: 20, font: { size: 13, weight: '600' } } },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: { size: 12.5, weight: '600' },
+                        generateLabels: (chart) => {
+                            const dataset = chart.data.datasets[0];
+                            const total = dataset.data.reduce((a, b) => a + b, 0);
+                            return chart.data.labels.map((label, i) => ({
+                                text: `${label} · ${dataset.data[i].toLocaleString('pt-BR')} pessoas`,
+                                fillStyle: dataset.backgroundColor[i],
+                                strokeStyle: dataset.backgroundColor[i],
+                                index: i
+                            }));
+                        }
+                    }
+                },
                 datalabels: {
                     color: '#fff',
-                    font: { weight: 'bold', size: 16 },
+                    font: { weight: 'bold', size: 20 },
                     formatter: (value, context) => {
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                         const percent = (value / total * 100).toFixed(1);
-                        return `${value}\n(${percent}%)`;
+                        return `${percent}%`;
                     }
                 }
             }
@@ -1627,12 +1643,13 @@ function renderCharts(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
             plugins: {
                 legend: { display: false },
                 datalabels: { anchor: 'end', align: 'top', ...datalabelsConfig }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { beginAtZero: true, grace: '15%', grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             }
         }
@@ -1660,12 +1677,13 @@ function renderCharts(data) {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 36 } },
             plugins: {
                 legend: { display: false },
                 datalabels: { anchor: 'end', align: 'right', ...datalabelsConfig }
             },
             scales: {
-                x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { beginAtZero: true, grace: '20%', grid: { color: '#f1f5f9' } },
                 y: { grid: { display: false } }
             }
         }
@@ -1690,12 +1708,13 @@ function renderCharts(data) {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 36 } },
             plugins: {
                 legend: { display: false },
                 datalabels: { anchor: 'end', align: 'right', ...datalabelsConfig }
             },
             scales: {
-                x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { beginAtZero: true, grace: '20%', grid: { color: '#f1f5f9' } },
                 y: { grid: { display: false } }
             }
         }
@@ -1728,6 +1747,7 @@ function renderCharts(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
             plugins: {
                 legend: { display: false },
                 datalabels: {
@@ -1740,7 +1760,7 @@ function renderCharts(data) {
                 }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { beginAtZero: true, grace: '15%', grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             }
         }
@@ -1812,6 +1832,7 @@ function renderCharts(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
             plugins: {
                 legend: { display: false },
                 datalabels: {
@@ -1824,7 +1845,7 @@ function renderCharts(data) {
                 }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { beginAtZero: true, grace: '15%', grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             }
         }
@@ -1846,12 +1867,13 @@ function renderCharts(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
             plugins: {
                 legend: { display: false },
                 datalabels: { anchor: 'end', align: 'top', ...datalabelsConfig }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { beginAtZero: true, grace: '15%', grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             }
         }
@@ -1867,7 +1889,7 @@ function renderCharts(data) {
                 label: 'Idosos',
                 data: topNacIdosos.map(p => p[1]),
                 backgroundColor: topNacIdosos.map(([pais]) =>
-                    pais.toLowerCase().includes('venezuela') ? '#f59e0b' : '#667eea'
+                    pais.toLowerCase().includes('venezuela') ? '#f59e0b' : '#00704a'
                 ),
                 borderRadius: 8,
                 borderSkipped: false,
@@ -1877,12 +1899,13 @@ function renderCharts(data) {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 36 } },
             plugins: {
                 legend: { display: false },
                 datalabels: { anchor: 'end', align: 'right', ...datalabelsConfig }
             },
             scales: {
-                x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { beginAtZero: true, grace: '20%', grid: { color: '#f1f5f9' } },
                 y: { grid: { display: false } }
             }
         }
