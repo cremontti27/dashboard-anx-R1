@@ -1183,6 +1183,52 @@ function extractData(workbook) {
         evolucaoMensal[mesKey] = ativosMes;
     });
 
+    // ── Tendência de Ocupação Mensal (base COMPLETA, ignora o filtro de período) ──
+    // Sempre de 1º de maio até ontem (data real do sistema) — cresce automaticamente
+    // conforme os meses passam, e nunca conta o dia de hoje (dado ainda incompleto).
+    const hojeReal = new Date();
+    hojeReal.setHours(0, 0, 0, 0);
+    const ontemReal = new Date(hojeReal.getTime() - 24 * 60 * 60 * 1000);
+
+    let anoInicioMaio = ontemReal.getFullYear();
+    let inicioMaio = new Date(anoInicioMaio, 4, 1); // mês 4 = maio (0-indexado)
+    if (ontemReal < inicioMaio) {
+        // Ainda não chegamos em maio deste ano: usa maio do ano anterior
+        anoInicioMaio -= 1;
+        inicioMaio = new Date(anoInicioMaio, 4, 1);
+    }
+
+    // Contagem diária (pessoas, deduplicado por família/dia) usando a base COMPLETA sem filtro de período
+    const entradasPorDiaCompleta = {};
+    entradasBrutas.forEach(entrada => {
+        if (!entrada.data) return;
+        if (entrada.data < inicioMaio || entrada.data > ontemReal) return;
+
+        const diaKey = entrada.data.toISOString().split('T')[0];
+        if (!entradasPorDiaCompleta[diaKey]) {
+            entradasPorDiaCompleta[diaKey] = { familias: new Set(), pessoas: 0 };
+        }
+        const parent = entrada._parent_index;
+        if (!entradasPorDiaCompleta[diaKey].familias.has(parent)) {
+            entradasPorDiaCompleta[diaKey].familias.add(parent);
+            entradasPorDiaCompleta[diaKey].pessoas += (pessoasPorFamilia[parent] || 1);
+        }
+    });
+
+    const tendenciaMensalCompleta = {};
+    let mesCursor = new Date(inicioMaio);
+    while (mesCursor <= ontemReal) {
+        const mesKey = mesCursor.toISOString().slice(0, 7);
+        tendenciaMensalCompleta[mesKey] = 0;
+        mesCursor = new Date(mesCursor.getFullYear(), mesCursor.getMonth() + 1, 1);
+    }
+
+    Object.keys(entradasPorDiaCompleta).forEach(diaKey => {
+        const mesKey = diaKey.slice(0, 7);
+        if (tendenciaMensalCompleta[mesKey] === undefined) return;
+        tendenciaMensalCompleta[mesKey] += entradasPorDiaCompleta[diaKey].pessoas;
+    });
+
     // Crianças ativas (0-17 anos)
     const criancasAtivas = individuosAtivos.filter(ind => {
         const idade = ind.idade_anos || 0;
@@ -1249,6 +1295,7 @@ function extractData(workbook) {
         totalEntradasUtilizacao: Object.values(utilizacaoEspaco).reduce((a, b) => a + b, 0),
         tempoPermanencia,
         evolucaoMensal,
+        tendenciaMensalCompleta,
         criancasAtivas,
         totalIdosos, idososMasc, idososFem, idososNacionalidade, idososFaixas,
         totalPCDAtivos, pcdIdosos, pcdMasc, pcdFem
@@ -1485,16 +1532,6 @@ function renderCharts(data) {
     }, {});
     const topPerfis = Object.entries(perfisData).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
-    const dataRef = data.dataReferencia || new Date();
-    const ultimos30Dias = Array.from({length: 30}, (_, i) => {
-        const ms = dataRef.getTime() - ((29 - i) * 24 * 60 * 60 * 1000);
-        const d = new Date(ms);
-        return d.toISOString().split('T')[0];
-    });
-    const ocupacaoPorDia = ultimos30Dias.map(dia => {
-        return data.entradasPorDia[dia] ? data.entradasPorDia[dia].pessoas : 0;
-    });
-
     const topNacionalidades = Object.entries(data.nacionalidadeData)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 8);
@@ -1524,10 +1561,6 @@ function renderCharts(data) {
             <h3>Evolução da Base Ativa (6 meses)</h3>
             <div class="chart-container"><canvas id="evolucaoChart"></canvas></div>
         </div>
-        <div class="chart-card" style="grid-column: 1 / -1;">
-            <h3>Tendência de Ocupação (30 dias)</h3>
-            <div class="chart-container"><canvas id="tendenciaChart"></canvas></div>
-        </div>
         <div class="chart-card">
             <h3>Faixas Etárias — Idosos (60+)</h3>
             <div class="chart-container"><canvas id="idososFaixasChart"></canvas></div>
@@ -1535,6 +1568,10 @@ function renderCharts(data) {
         <div class="chart-card">
             <h3>Nacionalidade dos Idosos (60+)</h3>
             <div class="chart-container"><canvas id="idososNacChart"></canvas></div>
+        </div>
+        <div class="chart-card" style="grid-column: 1 / -1;">
+            <h3>Tendência de Ocupação Mensal (desde maio)</h3>
+            <div class="chart-container"><canvas id="tendenciaChart"></canvas></div>
         </div>
     `;
 
@@ -1664,22 +1701,25 @@ function renderCharts(data) {
         }
     });
 
+    const mesesTendenciaLabels = Object.keys(data.tendenciaMensalCompleta).map(mesKey => {
+        const [ano, mes] = mesKey.split('-').map(Number);
+        return new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+    });
+    const valoresTendenciaMensal = Object.values(data.tendenciaMensalCompleta);
+
     charts.tendencia = new Chart(document.getElementById('tendenciaChart'), {
         type: 'line',
         data: {
-            labels: ultimos30Dias.map(d => {
-                const [y, m, dia] = d.split('-');
-                return `${dia}/${m}`;
-            }),
+            labels: mesesTendenciaLabels,
             datasets: [{
-                label: 'Pessoas/dia',
-                data: ocupacaoPorDia,
+                label: 'Pessoas atendidas no mês',
+                data: valoresTendenciaMensal,
                 borderColor: '#006847',
                 backgroundColor: 'rgba(0, 104, 71, 0.1)',
                 fill: true,
                 tension: 0.4,
                 borderWidth: 3,
-                pointRadius: 4,
+                pointRadius: 5,
                 pointBackgroundColor: '#006847',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
@@ -1695,8 +1735,8 @@ function renderCharts(data) {
                     align: 'top',
                     anchor: 'end',
                     color: '#1a202c',
-                    font: { weight: 'bold', size: 11 },
-                    formatter: (value) => value > 0 ? value : ''
+                    font: { weight: 'bold', size: 12 },
+                    formatter: (value) => value > 0 ? value.toLocaleString('pt-BR') : ''
                 }
             },
             scales: {
