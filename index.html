@@ -1524,12 +1524,19 @@ function renderCharts(data) {
         else faixasEtarias['60+']++;
     });
 
-    const perfisData = data.registrosAtivos.reduce((acc, reg) => {
-        const perfil = reg.Perfil || 'Não especificado';
+    // Perfis: conta INDIVÍDUOS (não famílias) — mapeia cada família ativa ao seu Perfil,
+    // depois soma quantos indivíduos pertencem a cada perfil.
+    const perfilPorFamilia = {};
+    data.registrosAtivos.forEach(reg => {
+        perfilPorFamilia[reg._index] = reg.Perfil || 'Não especificado';
+    });
+    const perfisData = data.individuosAtivos.reduce((acc, ind) => {
+        const perfil = perfilPorFamilia[ind._parent_index] || 'Não especificado';
         acc[perfil] = (acc[perfil] || 0) + 1;
         return acc;
     }, {});
     const topPerfis = Object.entries(perfisData).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const totalPerfis = Object.values(perfisData).reduce((a, b) => a + b, 0);
 
     const topNacionalidades = Object.entries(data.nacionalidadeData)
         .sort((a, b) => b[1] - a[1])
@@ -1628,6 +1635,8 @@ function renderCharts(data) {
         }
     });
 
+    const totalFaixas = Object.values(faixasEtarias).reduce((a, b) => a + b, 0);
+
     charts.idade = new Chart(document.getElementById('idadeChart'), {
         type: 'bar',
         data: {
@@ -1646,7 +1655,15 @@ function renderCharts(data) {
             layout: { padding: { top: 24 } },
             plugins: {
                 legend: { display: false },
-                datalabels: { anchor: 'end', align: 'top', ...datalabelsConfig }
+                datalabels: {
+                    anchor: 'end', align: 'top',
+                    color: '#1a202c',
+                    font: { weight: 'bold', size: 14 },
+                    formatter: (value) => {
+                        const pct = totalFaixas > 0 ? (value / totalFaixas * 100).toFixed(1) : 0;
+                        return `${pct}%  (${value.toLocaleString('pt-BR')})`;
+                    }
+                }
             },
             scales: {
                 y: { beginAtZero: true, grace: '15%', grid: { color: '#f1f5f9' } },
@@ -1708,13 +1725,21 @@ function renderCharts(data) {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            layout: { padding: { right: 36 } },
+            layout: { padding: { right: 60 } },
             plugins: {
                 legend: { display: false },
-                datalabels: { anchor: 'end', align: 'right', ...datalabelsConfig }
+                datalabels: {
+                    anchor: 'end', align: 'right',
+                    color: '#1a202c',
+                    font: { weight: 'bold', size: 14 },
+                    formatter: (value) => {
+                        const pct = totalPerfis > 0 ? (value / totalPerfis * 100).toFixed(1) : 0;
+                        return `${pct}%  (${value.toLocaleString('pt-BR')})`;
+                    }
+                }
             },
             scales: {
-                x: { beginAtZero: true, grace: '20%', grid: { color: '#f1f5f9' } },
+                x: { beginAtZero: true, grace: '30%', grid: { color: '#f1f5f9' } },
                 y: { grid: { display: false } }
             }
         }
